@@ -1,20 +1,3 @@
-// const btn = document.getElementById('foo');
-
-// function hello(event) {
-//     console.log(event);
-// }
-
-// btn.addEventListener('click', hello);
-
-// const myLink = document.getElementById('myLink');
-
-// function cancelLink(event) {
-//     event.preventDefault();
-//     alert('ah ah ah, you didn\'t say the magic word!');
-// }
-
-// myLink.addEventListener('click', cancelLink);
-
 class Item {
     constructor(name, price, aisle, sku) {
         this.name = name;
@@ -28,44 +11,12 @@ class Item {
     }
 }
 
-// let groceries = [
-//     {name: 'bananas', price: 3.49, aisle: 1, sku: 52039},
-//     {name: 'milk', price: 2.99, aisle: 4, sku: 24837},
-//     {name: 'peanut butter', price: 3.99, aisle: 7, sku: 18563}
-// ];
-let groceries = [];
-
-groceries.push(new Item('bananas', 3.49, 1, 52039));
-groceries.push(new Item('milk', 2.99, 4, 24837));
-groceries.push(new Item('peanut butter', 3.99, 7, 18563));
-groceries.push(new Item('Pepsi', 2.49, 8, 12457));
-
+const loadGroceries = false;
+const form = document.getElementById('new-item-form');
 const ul = document.getElementById('grocery-list');
+const groceries = [];
 
-function deleteItem(event) {
-    let pe = event.target.parentElement,
-        idx = Array.from(ul.children).indexOf(pe);
-
-    groceries.splice(idx, 1);
-    pe.remove();
-    console.log(groceries.length);
-}
-
-function makeDeleteButton(li) {
-    let btn = document.createElement('button');
-    btn.innerHTML = 'Delete';
-    btn.addEventListener('click', deleteItem);
-    li.appendChild(btn);
-}
-
-function showInfo(nameLink, info) {
-    nameLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        alert(info);
-    });
-}
-
-function listItem(g) {
+const addItem = (g) => {
     let li = document.createElement('li');
     li.dataset.sku = g.sku;
     let nameLink = document.createElement('a');
@@ -77,21 +28,68 @@ function listItem(g) {
     ul.appendChild(li);
 }
 
-for (let g of groceries) {
-    listItem(g);
+const deleteItem = (event) => {
+    let pe = event.target.parentElement,
+        idx = Array.from(ul.children).indexOf(pe);
+
+    groceries.splice(idx, 1);
+    pe.remove();
 }
 
+const makeDeleteButton = (li) => {
+    let btn = document.createElement('button');
+    btn.innerHTML = 'Delete';
+    btn.addEventListener('click', deleteItem);
+    li.appendChild(btn);
+}
 
-// for (let i=0, ii=groceries.length; i<ii; i++) {
-//     console.log(i, groceries[i])
-// }
+const showInfo = (nameLink, info) => {
+    nameLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        alert(info);
+    });
+}
 
-// let item = {
-//     name: "bananas",
-//     price: 3.49,
-//     aisle: 1
-// };
+const onFormSubmit = (event) => {
+    event.preventDefault();
+    let sku = Math.floor(Math.random() * 100000),
+        formData = new FormData(form),
+        _name = formData.get('name'),
+        _price = +formData.get('price'),
+        _aisle = +formData.get('aisle'),
+        g = new Item(_name, _price, _aisle, sku);
 
-// for (x in item) {
-//     console.log(x, item[x]);
-// }
+    groceries.push(g);
+    addItem(g);
+    form.reset();
+
+    localStorage.removeItem('groceries');
+
+    let storage = JSON.stringify(groceries);
+    localStorage.setItem('groceries', storage);
+}
+
+form.addEventListener('submit', onFormSubmit);
+
+if (loadGroceries) {
+    fetch('groceries.json')
+        .then((response) => response.json())
+        .then((data) => {
+            for (d of data) {
+                let g = new Item(d.name, d.aisle, d.price, d.sku);
+                groceries.push(g);
+                addItem(g);
+            }
+        });
+} else {
+    let storage = localStorage.getItem('groceries');
+
+    if (storage != null) {
+        storage = JSON.parse(storage);
+        for (s of storage) {
+            const g = new Item(s.name, s.price, s.aisle, s.sku);
+            groceries.push(g);
+            addItem(g);
+        }
+    }
+}

@@ -1,0 +1,26 @@
+[
+    {
+        "name": "bananas",
+        "price": 3.49, 
+        "aisle": 1, 
+        "sku": 52039
+    },
+    {
+        "name": "milk",
+        "price": 2.99,
+        "aisle": 4,
+        "sku": 24837
+    },
+    {
+        "name": "peanut butter",
+        "price": 3.99,
+        "aisle": 7, 
+        "sku": 18563
+    },
+    {
+        "name": "Pepsi", 
+        "price": 2.49,
+        "aisle": 8, 
+        "sku": 12457
+    }
+]
